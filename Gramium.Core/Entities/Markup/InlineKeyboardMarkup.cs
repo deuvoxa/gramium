@@ -6,7 +6,7 @@ public class InlineKeyboardMarkup(InlineKeyboardButton[][] inlineKeyboard) : IRe
 {
     [JsonPropertyName("inline_keyboard")]
     [JsonInclude]
-    public InlineKeyboardButton[][] InlineKeyboard { get; } = inlineKeyboard ?? throw new ArgumentNullException(nameof(inlineKeyboard));
+    public InlineKeyboardButton[][] InlineKeyboard { get; init; } = inlineKeyboard ?? throw new ArgumentNullException(nameof(inlineKeyboard));
 
     public static InlineKeyboardMarkup Create(params InlineKeyboardButton[] buttons)
     {

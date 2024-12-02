@@ -124,30 +124,49 @@ public class TelegramHttpClient : ITelegramClient
                 "application/json")
             : null;
 
-        using var response = await _client.PostAsync(
-            methodPath,
-            content ?? new StringContent(string.Empty),
-            ct);
+        return await SendRequestAsync<TResponse>(methodPath, content, ct);
+    }
 
-        var body = await response.Content.ReadAsStringAsync(ct);
-
-        if (!response.IsSuccessStatusCode)
+    private async Task<TResponse> SendRequestAsync<TResponse>(
+        string methodPath,
+        HttpContent? content = null,
+        CancellationToken ct = default)
+    {
+        try 
         {
-            throw new TelegramApiException($"Request failed with status code: {response.StatusCode}",
-                (int)response.StatusCode);
+            using var response = await _client.PostAsync(
+                methodPath,
+                content ?? new StringContent(string.Empty),
+                ct);
+
+            var body = await response.Content.ReadAsStringAsync(ct);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new TelegramApiException(
+                    $"Запрос завершился с ошибкой: {response.StatusCode}. Тело ответа: {body}",
+                    (int)response.StatusCode);
+            }
+
+            var result = JsonSerializer.Deserialize<TelegramResponse<TResponse>>(
+                body,
+                _jsonOptions);
+
+            if (result?.Ok != true || result.Result == null)
+            {
+                throw new TelegramApiException(
+                    $"Ошибка API Telegram: {result?.Description ?? "Неизвестная ошибка"}. Тело ответа: {body}",
+                    result?.ErrorCode ?? 0);
+            }
+
+            return result.Result;
         }
-
-        var result = JsonSerializer.Deserialize<TelegramResponse<TResponse>>(
-            body,
-            _jsonOptions);
-
-        if (result?.Ok != true || result.Result == null)
+        catch (Exception ex) when (ex is not TelegramApiException)
         {
             throw new TelegramApiException(
-                result?.Description ?? "Unknown error",
-                result?.ErrorCode ?? 0);
+                $"Ошибка при выполнении запроса: {ex.Message}",
+                0,
+                ex);
         }
-
-        return result.Result;
     }
 }

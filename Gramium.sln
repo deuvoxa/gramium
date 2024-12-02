@@ -4,17 +4,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gramium.Core", "Gramium.Cor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gramium.Examples.Basic", "Examples\Gramium.Examples.Basic\Gramium.Examples.Basic.csproj", "{58B4C937-182F-499D-9944-05F02ED27D64}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gramium.Extensions.DependencyInjection", "Extensions\Gramium.Extensions.DependencyInjection\Gramium.Extensions.DependencyInjection.csproj", "{A3460D51-0356-4D0A-8FC0-7B6240BB8B6A}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{DDA4F464-886F-4C2F-9776-1D95B6E5A8D1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{4EB4C8FE-A3CE-41F3-9BFB-04978633E1A6}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{1C638269-9ACD-4C51-B58D-77CB52EEA4E5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gramium.Extensions.Storage", "Extensions\Gramium.Extensions.Storage\Gramium.Extensions.Storage.csproj", "{D422A812-B3C4-467A-AB60-DD6BA7B73195}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gramium.Extensions.Logging", "Extensions\Gramium.Extensions.Logging\Gramium.Extensions.Logging.csproj", "{2ABB2EE5-3DFD-4195-B427-85AC90A84E72}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gramium.Client", "Gramium.Client\Gramium.Client.csproj", "{3EC525CB-DC87-45A9-ABC6-22333DF80F2F}"
 EndProject
@@ -34,18 +26,6 @@ Global
 		{58B4C937-182F-499D-9944-05F02ED27D64}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58B4C937-182F-499D-9944-05F02ED27D64}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58B4C937-182F-499D-9944-05F02ED27D64}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A3460D51-0356-4D0A-8FC0-7B6240BB8B6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A3460D51-0356-4D0A-8FC0-7B6240BB8B6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A3460D51-0356-4D0A-8FC0-7B6240BB8B6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A3460D51-0356-4D0A-8FC0-7B6240BB8B6A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D422A812-B3C4-467A-AB60-DD6BA7B73195}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D422A812-B3C4-467A-AB60-DD6BA7B73195}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D422A812-B3C4-467A-AB60-DD6BA7B73195}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D422A812-B3C4-467A-AB60-DD6BA7B73195}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2ABB2EE5-3DFD-4195-B427-85AC90A84E72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2ABB2EE5-3DFD-4195-B427-85AC90A84E72}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2ABB2EE5-3DFD-4195-B427-85AC90A84E72}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2ABB2EE5-3DFD-4195-B427-85AC90A84E72}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3EC525CB-DC87-45A9-ABC6-22333DF80F2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3EC525CB-DC87-45A9-ABC6-22333DF80F2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3EC525CB-DC87-45A9-ABC6-22333DF80F2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -57,8 +37,5 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{58B4C937-182F-499D-9944-05F02ED27D64} = {DDA4F464-886F-4C2F-9776-1D95B6E5A8D1}
-		{A3460D51-0356-4D0A-8FC0-7B6240BB8B6A} = {1C638269-9ACD-4C51-B58D-77CB52EEA4E5}
-		{D422A812-B3C4-467A-AB60-DD6BA7B73195} = {1C638269-9ACD-4C51-B58D-77CB52EEA4E5}
-		{2ABB2EE5-3DFD-4195-B427-85AC90A84E72} = {1C638269-9ACD-4C51-B58D-77CB52EEA4E5}
 	EndGlobalSection
 EndGlobal

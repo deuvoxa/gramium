@@ -2,6 +2,7 @@ using System.Reflection;
 using Gramium.Client;
 using Gramium.Framework.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using Gramium.Framework.Middleware;
 
 namespace Gramium.Framework.Extensions;
 
@@ -14,33 +15,45 @@ public static class ServiceCollectionExtensions
         if (string.IsNullOrEmpty(token))
             throw new ArgumentNullException(nameof(token));
 
-        services.Configure<TelegramClientOptions>(options => 
-        {
-            options.Token = token;
-        });
-        
-        services.AddHttpClient<ITelegramClient, TelegramHttpClient>();
+        services.Configure<TelegramClientOptions>(options => { options.Token = token; });
 
+        services.AddHttpClient<ITelegramClient, TelegramHttpClient>();
         services.AddSingleton<IGramiumBot, GramiumBot>();
 
+        services.AddSingleton<IUpdateMiddleware, LoggingMiddleware>();
+        services.AddSingleton<IUpdateMiddleware, ErrorHandlingMiddleware>();
+        services.AddSingleton<IUpdateMiddleware, CommandHandlingMiddleware>();
+
         var callingAssembly = Assembly.GetCallingAssembly();
-        
+
         var commandHandlers = callingAssembly.GetTypes()
             .Where(t => !t.IsAbstract && typeof(ICommandHandler).IsAssignableFrom(t));
 
         foreach (var handler in commandHandlers)
         {
-            services.AddScoped(typeof(ICommandHandler), handler);
+            services.AddScoped(handler);
+            services.AddScoped<ICommandHandler>(sp =>
+            {
+                var service = sp.GetRequiredService(handler);
+                return service as ICommandHandler ??
+                       throw new InvalidOperationException($"Не удалось создать обработчик команд типа {handler.Name}");
+            });
         }
-        
+
         var callbackHandlers = callingAssembly.GetTypes()
             .Where(t => !t.IsAbstract && typeof(ICallbackQueryHandler).IsAssignableFrom(t));
 
         foreach (var handler in callbackHandlers)
         {
-            services.AddScoped(typeof(ICallbackQueryHandler), handler);
+            services.AddScoped(handler);
+            services.AddScoped<ICallbackQueryHandler>(sp =>
+            {
+                var service = sp.GetRequiredService(handler);
+                return service as ICallbackQueryHandler ??
+                       throw new InvalidOperationException($"Не удалось создать обработчик callback-запросов типа {handler.Name}");
+            });
         }
 
         return services;
     }
-} 
+}
