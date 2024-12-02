@@ -2,18 +2,31 @@ using Gramium.Client;
 using Gramium.Core.Entities.Updates;
 using Gramium.Framework.Context;
 using Gramium.Framework.Interfaces;
+using Gramium.Framework.Middleware;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Gramium.Framework;
 
-public class GramiumBot(
-    ITelegramClient client,
-    IServiceProvider serviceProvider)
-    : IGramiumBot
+public class GramiumBot : IGramiumBot
 {
+    private readonly ITelegramClient _client;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly MiddlewarePipeline _pipeline;
     private long? _offset;
     private bool _isRunning;
-    private readonly TimeSpan _errorDelay = TimeSpan.FromSeconds(5);
+
+    public GramiumBot(
+        ITelegramClient client,
+        IServiceProvider serviceProvider,
+        IEnumerable<IUpdateMiddleware> middleware)
+    {
+        _client = client;
+        _serviceProvider = serviceProvider;
+        _pipeline = new MiddlewarePipeline();
+
+        foreach (var m in middleware) _pipeline.Use(m);
+    }
 
     public async Task StartAsync(CancellationToken ct = default)
     {
@@ -21,47 +34,16 @@ public class GramiumBot(
 
         while (_isRunning && !ct.IsCancellationRequested)
         {
-            var updates = await client.GetUpdatesAsync(
+            var updates = await _client.GetUpdatesAsync(
                 offset: (int?)_offset,
                 limit: 100,
                 ct: ct);
 
             foreach (var update in updates)
             {
-                await ProcessUpdateAsync(update, ct);
+                var context = new UpdateContext(update, _serviceProvider, ct);
+                await _pipeline.ExecuteAsync(context);
                 _offset = update.UpdateId + 1;
-            }
-        }
-    }
-
-    private async Task ProcessUpdateAsync(Update update, CancellationToken ct)
-    {
-        using var scope = serviceProvider.CreateScope();
-
-        if (update.Message?.Text != null)
-        {
-            var context = new MessageContext(update.Message, client, ct);
-            var handlers = scope.ServiceProvider.GetServices<ICommandHandler>().ToList();
-
-            foreach (var handler in handlers)
-            {
-                if (!string.IsNullOrEmpty(handler.Command) &&
-                    !update.Message.Text.StartsWith(handler.Command, StringComparison.OrdinalIgnoreCase)) continue;
-
-                await handler.HandleAsync(context, ct);
-                break;
-            }
-        }
-        else if (update.CallbackQuery != null)
-        {
-            var context = new CallbackQueryContext(update.CallbackQuery, client, ct);
-            var handlers = scope.ServiceProvider.GetServices<ICallbackQueryHandler>().ToList();
-
-            foreach (var handler in handlers.Where(handler =>
-                         update.CallbackQuery.Data?.StartsWith(handler.CallbackData) == true))
-            {
-                await handler.HandleAsync(context, ct);
-                break;
             }
         }
     }

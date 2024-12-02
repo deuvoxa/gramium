@@ -6,7 +6,7 @@ namespace Gramium.Examples.Basic.Handlers;
 
 public class MessageHandler : ICommandHandler
 {
-    public string Command => "";
+    public string Command => "/test";
 
     public async Task HandleAsync(IMessageContext context, CancellationToken ct = default)
     {
