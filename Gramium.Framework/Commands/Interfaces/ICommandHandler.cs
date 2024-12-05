@@ -1,9 +1,8 @@
 using Gramium.Framework.Context;
 
-namespace Gramium.Framework.Interfaces;
+namespace Gramium.Framework.Commands.Interfaces;
 
-public interface ICommandHandler
+public interface ICommandHandler : ICommandMetadata
 {
-    string Command { get; }
     Task HandleAsync(IMessageContext context, CancellationToken ct = default);
-} 
+}

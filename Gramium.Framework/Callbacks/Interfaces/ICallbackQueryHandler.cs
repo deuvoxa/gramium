@@ -1,9 +1,8 @@
 using Gramium.Framework.Context;
 
-namespace Gramium.Framework.Interfaces;
+namespace Gramium.Framework.Callbacks.Interfaces;
 
-public interface ICallbackQueryHandler
+public interface ICallbackQueryHandler : ICallbackMetadata
 {
-    string CallbackData { get; }
     Task HandleAsync(ICallbackQueryContext context, CancellationToken ct = default);
 }

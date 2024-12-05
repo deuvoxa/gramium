@@ -1,8 +1,10 @@
 using System.Reflection;
 using Gramium.Client;
+using Gramium.Framework.Callbacks.Interfaces;
 using Gramium.Framework.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Gramium.Framework.Middleware;
+using ICommandHandler = Gramium.Framework.Commands.Interfaces.ICommandHandler;
 
 namespace Gramium.Framework.Extensions;
 
@@ -20,11 +22,12 @@ public static class ServiceCollectionExtensions
         services.AddHttpClient<ITelegramClient, TelegramHttpClient>();
         services.AddSingleton<IGramiumBot, GramiumBot>();
 
+        var callingAssembly = Assembly.GetCallingAssembly();
+        
         services.AddSingleton<IUpdateMiddleware, LoggingMiddleware>();
         services.AddSingleton<IUpdateMiddleware, ErrorHandlingMiddleware>();
+        services.AddSingleton<IUpdateMiddleware, CallbackQueryHandlingMiddleware>();
         services.AddSingleton<IUpdateMiddleware, CommandHandlingMiddleware>();
-
-        var callingAssembly = Assembly.GetCallingAssembly();
 
         var commandHandlers = callingAssembly.GetTypes()
             .Where(t => !t.IsAbstract && typeof(ICommandHandler).IsAssignableFrom(t));

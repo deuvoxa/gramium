@@ -34,7 +34,7 @@ namespace Gramium.Framework.Middleware
             }
         }
         
-        private string GetUpdateType(Update update) =>
+        private static string GetUpdateType(Update update) =>
             update switch
             {
                 { Message: not null } => "Message",
