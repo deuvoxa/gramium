@@ -418,3 +418,7 @@ fabric.properties
 Logs/
 appsettings.*
 !appsettings.example.json
+
+gramium.db*
+
+Gramium.Framework/Migrations

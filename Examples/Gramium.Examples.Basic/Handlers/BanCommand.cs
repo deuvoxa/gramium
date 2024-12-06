@@ -34,7 +34,7 @@ public class BanCommand : CommandBase
         var keyboard = context.CreateKeyboard()
             .AddButton("Menu", "menu")
             .Build();
-
+    
         await context.ReplyAsync($"Пользователь {username} забанен на {duration} часов", keyboard);
     }
 }

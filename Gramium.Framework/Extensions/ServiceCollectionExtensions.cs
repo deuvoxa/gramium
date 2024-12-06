@@ -5,6 +5,9 @@ using Gramium.Framework.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Gramium.Framework.Middleware;
 using ICommandHandler = Gramium.Framework.Commands.Interfaces.ICommandHandler;
+using Gramium.Framework.Database;
+using Gramium.Framework.Database.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace Gramium.Framework.Extensions;
 
@@ -17,15 +20,25 @@ public static class ServiceCollectionExtensions
         if (string.IsNullOrEmpty(token))
             throw new ArgumentNullException(nameof(token));
 
-        services.Configure<TelegramClientOptions>(options => { options.Token = token; });
+        services.Configure<TelegramClientOptions>(options =>
+        {
+            options.Token = token;
+            options.Timeout = TimeSpan.FromSeconds(35);
+        });
 
         services.AddHttpClient<ITelegramClient, TelegramHttpClient>();
         services.AddSingleton<IGramiumBot, GramiumBot>();
 
+        services.AddDbContext<GramiumDbContext>(options =>
+            options.UseSqlite("Data Source=gramium.db"));
+
+        services.AddScoped<IUserService, UserService>();
+
         var callingAssembly = Assembly.GetCallingAssembly();
-        
+
         services.AddSingleton<IUpdateMiddleware, LoggingMiddleware>();
         services.AddSingleton<IUpdateMiddleware, ErrorHandlingMiddleware>();
+        services.AddSingleton<IUpdateMiddleware, UserTrackingMiddleware>();
         services.AddSingleton<IUpdateMiddleware, CallbackQueryHandlingMiddleware>();
         services.AddSingleton<IUpdateMiddleware, CommandHandlingMiddleware>();
 
@@ -53,7 +66,8 @@ public static class ServiceCollectionExtensions
             {
                 var service = sp.GetRequiredService(handler);
                 return service as ICallbackQueryHandler ??
-                       throw new InvalidOperationException($"Не удалось создать обработчик callback-запросов типа {handler.Name}");
+                       throw new InvalidOperationException(
+                           $"Не удалось создать обработчик callback-запросов типа {handler.Name}");
             });
         }
 
