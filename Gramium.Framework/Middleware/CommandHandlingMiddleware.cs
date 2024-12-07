@@ -6,8 +6,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Gramium.Framework.Middleware;
 
-public class CommandHandlingMiddleware(ITelegramClient client, ILogger<CommandHandlingMiddleware> logger)
-    : IUpdateMiddleware
+public class CommandHandlingMiddleware(
+    ITelegramClient client, 
+    ILogger<CommandHandlingMiddleware> logger,
+    IServiceScopeFactory scopeFactory) : IUpdateMiddleware
 {
     public async Task HandleAsync(UpdateContext context, UpdateDelegate next)
     {
@@ -17,7 +19,7 @@ public class CommandHandlingMiddleware(ITelegramClient client, ILogger<CommandHa
             return;
         }
 
-        using var scope = context.Services.CreateScope();
+        using var scope = scopeFactory.CreateScope();
         var handlers = scope.ServiceProvider.GetServices<ICommandHandler>().ToList();
 
         var messageText = context.Update.Message.Text;
@@ -32,7 +34,7 @@ public class CommandHandlingMiddleware(ITelegramClient client, ILogger<CommandHa
             logger.LogInformation("Найден обработчик {HandlerType} для команды {Command}", 
                 handler.GetType().Name, command);
                 
-            var messageContext = new MessageContext(context.Update.Message, client, context.CancellationToken);
+            var messageContext = new MessageContext(context.Update.Message, client, scope.ServiceProvider, context.CancellationToken);
             await handler.HandleAsync(messageContext, context.CancellationToken);
         }
 

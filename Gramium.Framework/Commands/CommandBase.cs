@@ -13,19 +13,22 @@ public abstract class CommandBase : ICommandHandler, ICommandParameters, IComman
 
     public virtual ValidationResult Validate(string[] args)
     {
-        if (Parameters.Length == 0) return ValidationResult.Success();
-
+        var commandArgs = args.Skip(1).ToArray();
         var requiredParams = Parameters.Count(p => !p.IsOptional);
-        if (args.Length < requiredParams)
+        
+        if (commandArgs.Length < requiredParams)
         {
+            var usage = $"/{Command} " + string.Join(" ", Parameters.Select(p => 
+                p.IsOptional ? $"[{p.Name}]" : $"<{p.Name}>"));
+                
             return ValidationResult.Error(
-                $"Недостаточно параметров. Требуется минимум {requiredParams}, получено {args.Length}");
+                $"Недостаточно параметров. Использование: {usage}");
         }
-
-        for (var i = 0; i < args.Length && i < Parameters.Length; i++)
+        
+        for (var i = 0; i < commandArgs.Length && i < Parameters.Length; i++)
         {
             var param = Parameters[i];
-            var arg = args[i];
+            var arg = commandArgs[i];
 
             if (!TryParseParameter(arg, param.Type, out _))
             {
@@ -39,25 +42,34 @@ public abstract class CommandBase : ICommandHandler, ICommandParameters, IComman
 
     protected object?[] ParseParameters(string[] args)
     {
+        var commandArgs = args.Skip(1).ToArray();
+        
+        if (commandArgs.Length == 0 && Parameters.Length > 0)
+        {
+            var usage = $"/{Command} " + string.Join(" ", Parameters.Select(p => 
+                p.IsOptional ? $"[{p.Name}]" : $"<{p.Name}>"));
+            throw new ArgumentException($"Использование: {usage}");
+        }
+
         var result = new object?[Parameters.Length];
-    
+
         for (var i = 0; i < Parameters.Length; i++)
         {
             var param = Parameters[i];
-            var value = i < args.Length ? args[i] : param.DefaultValue;
-    
+            var value = i < commandArgs.Length ? commandArgs[i] : param.DefaultValue;
+
             if (value == null && !param.IsOptional)
             {
                 throw new ArgumentException($"Отсутствует обязательный параметр '{param.Name}'");
             }
-    
+
             if (value != null)
             {
                 if (!TryParseParameter(value.ToString()!, param.Type, out var parsedValue))
                 {
                     throw new ArgumentException($"Неверный формат параметра '{param.Name}'");
                 }
-    
+
                 result[i] = parsedValue;
             }
             else
@@ -65,7 +77,7 @@ public abstract class CommandBase : ICommandHandler, ICommandParameters, IComman
                 result[i] = null;
             }
         }
-    
+
         return result;
     }
 

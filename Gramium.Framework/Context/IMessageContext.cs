@@ -9,6 +9,7 @@ public interface IMessageContext
     Message Message { get; }
     ITelegramClient Client { get; }
     CancellationToken CancellationToken { get; }
+    IServiceProvider Services { get; }
     
     Task<Message> ReplyAsync(string text, IReplyMarkup? replyMarkup = null);
     Task DeleteMessageAsync();

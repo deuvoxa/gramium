@@ -7,6 +7,7 @@ using Gramium.Framework.Middleware;
 using ICommandHandler = Gramium.Framework.Commands.Interfaces.ICommandHandler;
 using Gramium.Framework.Database;
 using Gramium.Framework.Database.Services;
+using Gramium.Framework.Pagination;
 using Microsoft.EntityFrameworkCore;
 
 namespace Gramium.Framework.Extensions;
@@ -32,6 +33,7 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<GramiumDbContext>(options =>
             options.UseSqlite("Data Source=gramium.db"));
 
+        services.AddScoped<IPayloadService, PayloadService>();
         services.AddScoped<IUserService, UserService>();
 
         var callingAssembly = Assembly.GetCallingAssembly();
@@ -58,6 +60,10 @@ public static class ServiceCollectionExtensions
 
         var callbackHandlers = callingAssembly.GetTypes()
             .Where(t => !t.IsAbstract && typeof(ICallbackQueryHandler).IsAssignableFrom(t));
+        
+        services.AddScoped<PaginationCallback>();
+        services.AddScoped<ICallbackQueryHandler>(sp => 
+            sp.GetRequiredService<PaginationCallback>());
 
         foreach (var handler in callbackHandlers)
         {

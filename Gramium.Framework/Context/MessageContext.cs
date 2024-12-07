@@ -7,18 +7,19 @@ namespace Gramium.Framework.Context;
 public class MessageContext(
     Message message,
     ITelegramClient client,
+    IServiceProvider services,
     CancellationToken ct = default)
     : IMessageContext
 {
     public Message Message { get; } = message;
     public ITelegramClient Client { get; } = client;
     public CancellationToken CancellationToken { get; } = ct;
+    public IServiceProvider Services { get; } = services;
 
     public Task<Message> ReplyAsync(string text, IReplyMarkup? replyMarkup = null)
     {
         return Client.SendMessageAsync(Message.Chat.Id, text, replyMarkup, CancellationToken);
     }
-
     public Task DeleteMessageAsync()
     {
         return Client.DeleteMessageAsync(Message.Chat.Id, Message.MessageId, CancellationToken);

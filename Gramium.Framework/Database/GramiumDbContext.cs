@@ -8,6 +8,7 @@ public class GramiumDbContext(DbContextOptions<GramiumDbContext> options) : DbCo
     public DbSet<TelegramUser> Users { get; set; } = null!;
     public DbSet<UserState> States { get; set; } = null!;
     public DbSet<UserMetadata> Metadata { get; set; } = null!;
+    public DbSet<PayloadEntity> Payloads { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -29,7 +30,7 @@ public class GramiumDbContext(DbContextOptions<GramiumDbContext> options) : DbCo
         {
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => new { e.UserId, e.Key }).IsUnique();
-            
+
             entity.HasOne(e => e.User)
                 .WithMany(e => e.States)
                 .HasForeignKey(e => e.UserId)
@@ -40,11 +41,16 @@ public class GramiumDbContext(DbContextOptions<GramiumDbContext> options) : DbCo
         {
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => new { e.UserId, e.Key }).IsUnique();
-            
+
             entity.HasOne(e => e.User)
                 .WithMany(e => e.Metadata)
                 .HasForeignKey(e => e.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
+
+        modelBuilder.Entity<PayloadEntity>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+        });
     }
-} 
+}
