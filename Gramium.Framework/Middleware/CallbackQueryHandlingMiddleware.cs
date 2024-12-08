@@ -9,7 +9,8 @@ namespace Gramium.Framework.Middleware
 {
     public class CallbackQueryHandlingMiddleware(
         ITelegramClient client,
-        IServiceScopeFactory serviceScopeFactory)
+        IServiceScopeFactory serviceScopeFactory,
+        IServiceProvider serviceProvider)
         : IUpdateMiddleware
     {
         public async Task HandleAsync(UpdateContext context, UpdateDelegate next)
@@ -44,6 +45,7 @@ namespace Gramium.Framework.Middleware
                         payloadContextType,
                         context.Update.CallbackQuery,
                         client,
+                        serviceProvider,
                         typedPayload,
                         context.CancellationToken) as ICallbackQueryContext;
 
@@ -59,7 +61,7 @@ namespace Gramium.Framework.Middleware
                 {
                     var callbackContext = new CallbackQueryContext(
                         context.Update.CallbackQuery, 
-                        client,
+                        client,serviceProvider,
                         context.CancellationToken);
                         
                     await handler.HandleAsync(callbackContext, context.CancellationToken);

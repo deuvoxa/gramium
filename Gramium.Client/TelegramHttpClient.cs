@@ -80,31 +80,19 @@ public class TelegramHttpClient : ITelegramClient
         await SendAsync<bool>("deleteMessage", request, ct);
     }
 
-    public async Task AnswerCallbackQueryAsync(
-        string callbackQueryId,
-        string? text = null,
-        CancellationToken ct = default)
-    {
-        var request = new
-        {
-            callback_query_id = callbackQueryId,
-            text
-        };
-
-        await SendAsync<bool>("answerCallbackQuery", request, ct);
-    }
-
     public async Task<Message> EditMessageTextAsync(
         long chatId,
         long messageId,
         string text,
+        IReplyMarkup? replyMarkup = null,
         CancellationToken ct = default)
     {
         var request = new
         {
             chat_id = chatId,
             message_id = messageId,
-            text
+            text,
+            reply_markup = replyMarkup
         };
 
         return await SendAsync<Message>("editMessageText", request, ct);

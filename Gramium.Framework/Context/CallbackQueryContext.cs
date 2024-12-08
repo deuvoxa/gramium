@@ -1,23 +1,21 @@
 using Gramium.Client;
 using Gramium.Core.Entities.Callbacks;
+using Gramium.Core.Entities.Markup;
 
 namespace Gramium.Framework.Context;
 
 public class CallbackQueryContext(
     CallbackQuery callbackQuery,
     ITelegramClient client,
+    IServiceProvider services,
     CancellationToken ct = default)
     : ICallbackQueryContext
 {
     public CallbackQuery CallbackQuery { get; } = callbackQuery;
     public ITelegramClient Client { get; } = client;
+    public IServiceProvider Services { get; } = services;
 
-    public Task AnswerCallbackQueryAsync(string? text = null)
-    {
-        return Client.AnswerCallbackQueryAsync(CallbackQuery.Id, text, ct);
-    }
-
-    public Task EditMessageTextAsync(string text)
+    public Task EditMessageTextAsync(string text, IReplyMarkup? replyMarkup = null)
     {
         if (CallbackQuery.Message == null)
             throw new InvalidOperationException("Message is null");
@@ -26,6 +24,7 @@ public class CallbackQueryContext(
             CallbackQuery.Message.Chat.Id,
             CallbackQuery.Message.MessageId,
             text,
+            replyMarkup,
             ct);
     }
 }

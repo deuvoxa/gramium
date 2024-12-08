@@ -15,10 +15,29 @@ public static class InlineKeyboardBuilderExtensions
         string text,
         TPayload payload) where TPayload : class
     {
-        var payloadService = context.Services.GetRequiredService<IPayloadService>();
+        return WithPayloadButtonInternal(builder, context.Services, text, payload);
+    }
+
+    // dont work 
+    public static InlineKeyboardBuilder WithPayloadButton<TPayload>(
+        this InlineKeyboardBuilder builder,
+        ICallbackQueryContext context,
+        string text,
+        TPayload payload) where TPayload : class
+    {
+        return WithPayloadButtonInternal(builder, context.Services, text, payload);
+    }
+
+    private static InlineKeyboardBuilder WithPayloadButtonInternal<TPayload>(
+        InlineKeyboardBuilder builder,
+        IServiceProvider services,
+        string text,
+        TPayload payload) where TPayload : class
+    {
+        var payloadService = services.GetRequiredService<IPayloadService>();
         
         var callbackType = typeof(PayloadCallbackBase<>).MakeGenericType(typeof(TPayload));
-        var handlerType = context.Services.GetServices<ICallbackQueryHandler>()
+        var handlerType = services.GetServices<ICallbackQueryHandler>()
             .First(h => callbackType.IsInstanceOfType(h))
             .GetType()
             .FullName!;
