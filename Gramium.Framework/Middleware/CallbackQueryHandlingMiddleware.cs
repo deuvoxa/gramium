@@ -2,6 +2,7 @@ using System.Text.Json;
 using Gramium.Client;
 using Gramium.Framework.Callbacks.Interfaces;
 using Gramium.Framework.Context;
+using Gramium.Framework.Context.Interfaces;
 using Gramium.Framework.Database.Services;
 using Microsoft.Extensions.DependencyInjection;
 

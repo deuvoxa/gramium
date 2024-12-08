@@ -1,6 +1,7 @@
 using Gramium.Client;
 using Gramium.Core.Entities.Markup;
 using Gramium.Core.Entities.Messages;
+using Gramium.Framework.Context.Interfaces;
 
 namespace Gramium.Framework.Context;
 
@@ -9,17 +10,24 @@ public class MessageContext(
     ITelegramClient client,
     IServiceProvider services,
     CancellationToken ct = default)
-    : IMessageContext
+    : BaseContext(client, services, message: message, ct), IMessageContext
 {
     public Message Message { get; } = message;
-    public ITelegramClient Client { get; } = client;
-    public CancellationToken CancellationToken { get; } = ct;
-    public IServiceProvider Services { get; } = services;
 
-    public Task<Message> ReplyAsync(string text, IReplyMarkup? replyMarkup = null)
+    public async Task<Message> EditTextMessageAsync(long messageId, string text, ParseMode parseMode = ParseMode.None,
+        IReplyMarkup? replyMarkup = null)
     {
-        return Client.SendMessageAsync(Message.Chat.Id, text, replyMarkup, CancellationToken);
+        if (Message == null)
+            throw new InvalidOperationException("Message is null");
+
+        return await Client.EditMessageTextAsync(
+            Message.Chat.Id,
+            messageId,
+            text,
+            replyMarkup,
+            CancellationToken);
     }
+
     public Task DeleteMessageAsync()
     {
         return Client.DeleteMessageAsync(Message.Chat.Id, Message.MessageId, CancellationToken);

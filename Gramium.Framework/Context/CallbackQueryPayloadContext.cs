@@ -1,5 +1,6 @@
 using Gramium.Client;
 using Gramium.Core.Entities.Callbacks;
+using Gramium.Framework.Context.Interfaces;
 
 namespace Gramium.Framework.Context;
 

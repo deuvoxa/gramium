@@ -1,4 +1,5 @@
 ﻿using Gramium.Framework.Context;
+using Gramium.Framework.Context.Interfaces;
 using Gramium.Framework.Extensions;
 using Gramium.Framework.Markup;
 
@@ -74,7 +75,7 @@ public class PaginationBuilder<T>(IMessageContext context, IEnumerable<T> items)
             _footer != null ? string.Format(_footer, page, totalPages) : null
         }.Where(x => !string.IsNullOrEmpty(x)));
 
-        await context.ReplyAsync(messageText, keyboard.Build());
+        await context.SendMessageAsync(messageText, replyMarkup: keyboard.Build());
         return;
         
         PaginationPayload CreatePayload(string direction)

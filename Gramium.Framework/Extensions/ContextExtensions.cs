@@ -1,4 +1,5 @@
 using Gramium.Framework.Context;
+using Gramium.Framework.Context.Interfaces;
 using Gramium.Framework.Markup;
 using Gramium.Framework.Pagination;
 

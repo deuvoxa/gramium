@@ -1,5 +1,6 @@
 ﻿using Gramium.Framework.Callbacks;
 using Gramium.Framework.Context;
+using Gramium.Framework.Context.Interfaces;
 
 namespace Gramium.Examples.Basic.Handlers;
 
@@ -25,7 +26,7 @@ public class ModerateUserCallback : PayloadCallbackBase<ModerateUserPayload>
             _ => throw new ArgumentException($"Неизвестное действие: {payload.Action}")
         };
 
-        await context.EditMessageTextAsync(
+        await context.EditTextMessageAsync(
             $"Пользователь {payload.UserId} {actionText} на {payload.Duration} минут");
     }
 }

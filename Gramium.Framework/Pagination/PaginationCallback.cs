@@ -1,5 +1,6 @@
 ﻿using Gramium.Framework.Callbacks;
 using Gramium.Framework.Context;
+using Gramium.Framework.Context.Interfaces;
 using Gramium.Framework.Database.Services;
 using Gramium.Framework.Markup;
 
@@ -50,6 +51,6 @@ public class PaginationCallback(IPayloadService payloadService)
                 await payloadService.SavePayloadAsync(GetType().FullName!, payload with { Page = newPage, Direction = "next" }));
         }
 
-        await context.EditMessageTextAsync(messageText, keyboard.Build());
+        await context.EditTextMessageAsync(messageText, replyMarkup: keyboard.Build());
     }
 }

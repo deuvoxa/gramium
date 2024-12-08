@@ -1,6 +1,7 @@
 using Gramium.Framework.Commands.Interfaces;
 using Gramium.Framework.Commands.Models;
 using Gramium.Framework.Context;
+using Gramium.Framework.Context.Interfaces;
 
 namespace Gramium.Framework.Commands;
 

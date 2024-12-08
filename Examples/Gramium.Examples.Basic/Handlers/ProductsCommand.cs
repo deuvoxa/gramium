@@ -1,5 +1,6 @@
 ﻿using Gramium.Framework.Commands;
 using Gramium.Framework.Context;
+using Gramium.Framework.Context.Interfaces;
 using Gramium.Framework.Extensions;
 
 namespace Gramium.Examples.Basic.Handlers;
@@ -15,7 +16,7 @@ public class ProductsCommand : CommandBase
 
         if (!validation.IsValid)
         {
-            await context.ReplyAsync(validation.ErrorMessage!);
+            await context.SendMessageAsync(validation.ErrorMessage!);
             return;
         }
 

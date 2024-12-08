@@ -1,5 +1,5 @@
 ﻿using Gramium.Framework.Callbacks;
-using Gramium.Framework.Context;
+using Gramium.Framework.Context.Interfaces;
 
 namespace Gramium.Examples.Basic.Handlers;
 
@@ -10,6 +10,6 @@ public class MenuCallback : CallbackQueryBase
 
     public override async Task HandleAsync(ICallbackQueryContext context, CancellationToken ct = default)
     {
-        await context.EditMessageTextAsync("Главное меню");
+        await context.EditTextMessageAsync("Главное меню");
     }
 }

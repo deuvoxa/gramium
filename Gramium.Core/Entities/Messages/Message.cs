@@ -19,4 +19,16 @@ public class Message
 
     [JsonPropertyName("text")]
     public string? Text { get; set; }
+
+    [JsonPropertyName("photo")]
+    public PhotoSize[]? Photo { get; set; }
+
+    [JsonPropertyName("document")]
+    public Document? Document { get; set; }
+
+    [JsonPropertyName("video")]
+    public Video? Video { get; set; }
+
+    [JsonPropertyName("caption")]
+    public string? Caption { get; set; }
 }

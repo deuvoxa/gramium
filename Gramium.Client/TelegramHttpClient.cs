@@ -34,6 +34,55 @@ public class TelegramHttpClient : ITelegramClient
         _client.BaseAddress = new Uri(options.Value.GetBaseUrl());
         _client.Timeout = options.Value.Timeout;
     }
+    
+    private async Task<TResponse> SendAsync<TResponse>(
+        string method,
+        object? request = null,
+        CancellationToken ct = default)
+    {
+        var methodPath = method.TrimStart('/');
+        
+        using var content = request != null
+            ? new StringContent(
+                JsonSerializer.Serialize(request, _jsonOptions),
+                Encoding.UTF8,
+                "application/json")
+            : null;
+
+        using var response = await _client.PostAsync(
+            methodPath,
+            content ?? new StringContent(string.Empty),
+            ct);
+
+        return await HandleResponseAsync<TResponse>(response, ct);
+    }
+
+    private async Task<TResponse> HandleResponseAsync<TResponse>(
+        HttpResponseMessage response, 
+        CancellationToken ct)
+    {
+        var body = await response.Content.ReadAsStringAsync(ct);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new TelegramApiException(
+                $"Запрос завершился с ошибкой: {response.StatusCode}. Тело ответа: {body}",
+                (int)response.StatusCode);
+        }
+
+        var result = JsonSerializer.Deserialize<TelegramResponse<TResponse>>(
+            body,
+            _jsonOptions);
+
+        if (result?.Ok != true || result.Result == null)
+        {
+            throw new TelegramApiException(
+                $"Ошибка API Telegram: {result?.Description ?? "Неизвестная ошибка"}. Тело ответа: {body}",
+                result?.ErrorCode ?? 0);
+        }
+
+        return result.Result;
+    }
 
     public async Task<Update[]> GetUpdatesAsync(
         int? offset = null,
@@ -49,23 +98,6 @@ public class TelegramHttpClient : ITelegramClient
 
         return await SendAsync<Update[]>("getUpdates", request, ct);
     }
-
-    public async Task<Message> SendMessageAsync(
-        long chatId,
-        string text,
-        IReplyMarkup? replyMarkup = null,
-        CancellationToken ct = default)
-    {
-        var request = new
-        {
-            chat_id = chatId,
-            text,
-            reply_markup = replyMarkup
-        };
-
-        return await SendAsync<Message>("sendMessage", request, ct);
-    }
-
     public async Task DeleteMessageAsync(
         long chatId,
         long messageId,
@@ -98,63 +130,89 @@ public class TelegramHttpClient : ITelegramClient
         return await SendAsync<Message>("editMessageText", request, ct);
     }
 
-    private async Task<TResponse> SendAsync<TResponse>(
-        string method,
-        object? request = null,
+    public async Task<Message> SendPhotoAsync(
+        long chatId,
+        string photo,
+        string? caption = null,
+        ParseMode parseMode = ParseMode.None,
+        IReplyMarkup? replyMarkup = null,
         CancellationToken ct = default)
     {
-        var methodPath = method.TrimStart('/');
+        var request = new
+        {
+            chat_id = chatId,
+            photo,
+            caption,
+            parse_mode = GetParseModeString(parseMode),
+            reply_markup = replyMarkup
+        };
 
-        using var content = request != null
-            ? new StringContent(
-                JsonSerializer.Serialize(request, _jsonOptions),
-                Encoding.UTF8,
-                "application/json")
-            : null;
-
-        return await SendRequestAsync<TResponse>(methodPath, content, ct);
+        return await SendAsync<Message>("sendPhoto", request, ct);
     }
 
-    private async Task<TResponse> SendRequestAsync<TResponse>(
-        string methodPath,
-        HttpContent? content = null,
+    public async Task<Message> SendDocumentAsync(
+        long chatId,
+        string document,
+        string? caption = null,
+        ParseMode parseMode = ParseMode.None,
+        IReplyMarkup? replyMarkup = null,
         CancellationToken ct = default)
     {
-        try 
+        var request = new
         {
-            using var response = await _client.PostAsync(
-                methodPath,
-                content ?? new StringContent(string.Empty),
-                ct);
+            chat_id = chatId,
+            document,
+            caption,
+            parse_mode = GetParseModeString(parseMode),
+            reply_markup = replyMarkup
+        };
 
-            var body = await response.Content.ReadAsStringAsync(ct);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new TelegramApiException(
-                    $"Запрос завершился с ошибкой: {response.StatusCode}. Тело ответа: {body}",
-                    (int)response.StatusCode);
-            }
-
-            var result = JsonSerializer.Deserialize<TelegramResponse<TResponse>>(
-                body,
-                _jsonOptions);
-
-            if (result?.Ok != true || result.Result == null)
-            {
-                throw new TelegramApiException(
-                    $"Ошибка API Telegram: {result?.Description ?? "Неизвестная ошибка"}. Тело ответа: {body}",
-                    result?.ErrorCode ?? 0);
-            }
-
-            return result.Result;
-        }
-        catch (Exception ex) when (ex is not TelegramApiException)
-        {
-            throw new TelegramApiException(
-                $"Ошибка при выполнении запроса: {ex.Message}",
-                0,
-                ex);
-        }
+        return await SendAsync<Message>("sendDocument", request, ct);
     }
+
+    public async Task<Message> SendVideoAsync(
+        long chatId,
+        string video,
+        string? caption = null,
+        ParseMode parseMode = ParseMode.None,
+        IReplyMarkup? replyMarkup = null,
+        CancellationToken ct = default)
+    {
+        var request = new
+        {
+            chat_id = chatId,
+            video,
+            caption,
+            parse_mode = GetParseModeString(parseMode),
+            reply_markup = replyMarkup
+        };
+
+        return await SendAsync<Message>("sendVideo", request, ct);
+    }
+
+    public async Task<Message> SendMessageAsync(
+        long chatId,
+        string text,
+        ParseMode parseMode = ParseMode.None,
+        IReplyMarkup? replyMarkup = null,
+        CancellationToken ct = default)
+    {
+        var request = new
+        {
+            chat_id = chatId,
+            text,
+            parse_mode = GetParseModeString(parseMode),
+            reply_markup = replyMarkup
+        };
+
+        return await SendAsync<Message>("sendMessage", request, ct);
+    }
+
+    private static string GetParseModeString(ParseMode parseMode) => parseMode switch
+    {
+        ParseMode.MarkdownV2 => "MarkdownV2",
+        ParseMode.HTML => "HTML",
+        ParseMode.Markdown => "Markdown",
+        _ => string.Empty
+    };
 }
