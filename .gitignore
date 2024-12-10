@@ -422,3 +422,4 @@ appsettings.*
 gramium.db*
 
 Gramium.Framework/Migrations
+Gramium.Examples.BudgetManager/Database/Migrations

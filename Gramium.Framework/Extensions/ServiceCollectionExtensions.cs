@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Gramium.Framework.Middleware;
 using ICommandHandler = Gramium.Framework.Commands.Interfaces.ICommandHandler;
 using Gramium.Framework.Database;
+using Gramium.Framework.Database.Enums;
 using Gramium.Framework.Database.Services;
 using Gramium.Framework.Pagination;
 using Microsoft.EntityFrameworkCore;
@@ -75,6 +76,23 @@ public static class ServiceCollectionExtensions
                        throw new InvalidOperationException(
                            $"Не удалось создать обработчик callback-запросов типа {handler.Name}");
             });
+        }
+
+        return services;
+    }
+
+    public static IServiceCollection AddDatabase<TContext>(
+        this IServiceCollection services,
+        string connectionString,
+        DatabaseProvider provider,
+        bool autoApplyMigrations = true) where TContext : DbContext
+    {
+        services.AddScoped<TContext>(sp => 
+            (TContext)Activator.CreateInstance(typeof(TContext), connectionString, provider)!);
+
+        if (autoApplyMigrations)
+        {
+            services.AddHostedService<DatabaseMigrationService<TContext>>();
         }
 
         return services;

@@ -1,19 +1,24 @@
+using Gramium.Examples.BudgetManager.Database;
+using Gramium.Framework.Database.Enums;
 using Gramium.Framework.Extensions;
 using Gramium.Framework.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
+var services = builder.Services;
+var configuration = builder.Configuration;
 
-builder.Services.AddLogging(logging =>
+services.AddLogging(logging =>
 {
     logging.AddConsole();
     logging.SetMinimumLevel(LogLevel.Debug);
 });
 
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+services.AddControllers();
+services.AddEndpointsApiExplorer();
+services.AddSwaggerGen();
 
-builder.Services.AddGramium(builder.Configuration["Telegram:Token"]!);
+services.AddGramium(configuration["Telegram:Token"]!)
+    .AddDatabase<BudgetManagerDbContext>(configuration.GetConnectionString("DefaultConnection")!, DatabaseProvider.Postgresql);
 
 var app = builder.Build();
 
