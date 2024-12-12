@@ -116,6 +116,7 @@ public class TelegramHttpClient : ITelegramClient
         long chatId,
         long messageId,
         string text,
+        ParseMode parseMode = ParseMode.None,
         IReplyMarkup? replyMarkup = null,
         CancellationToken ct = default)
     {
@@ -124,6 +125,7 @@ public class TelegramHttpClient : ITelegramClient
             chat_id = chatId,
             message_id = messageId,
             text,
+            parse_mode = GetParseModeString(parseMode),
             reply_markup = replyMarkup
         };
 

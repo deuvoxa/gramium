@@ -24,6 +24,7 @@ public class MessageContext(
             Message.Chat.Id,
             messageId,
             text,
+            parseMode,
             replyMarkup,
             CancellationToken);
     }

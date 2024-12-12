@@ -1,4 +1,5 @@
 using Gramium.Examples.BudgetManager.Database;
+using Gramium.Examples.BudgetManager.Services;
 using Gramium.Framework.Database.Enums;
 using Gramium.Framework.Extensions;
 using Gramium.Framework.Interfaces;
@@ -19,6 +20,7 @@ services.AddSwaggerGen();
 
 services.AddGramium(configuration["Telegram:Token"]!)
     .AddDatabase<BudgetManagerDbContext>(configuration.GetConnectionString("DefaultConnection")!, DatabaseProvider.Postgresql);
+services.AddScoped<UserService>();
 
 var app = builder.Build();
 

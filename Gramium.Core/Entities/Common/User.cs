@@ -11,5 +11,5 @@ public class User
     [JsonPropertyName("language_code")]
     public string? LanguageCode { get; set; }
     [JsonPropertyName("is_premium")]
-    public bool? IsPremium { get; set; }
+    public bool IsPremium { get; set; }
 } 

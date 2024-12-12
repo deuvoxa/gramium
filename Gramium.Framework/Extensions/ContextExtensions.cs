@@ -10,6 +10,9 @@ public static class ContextExtensions
     public static InlineKeyboardBuilder CreateKeyboard(this IMessageContext context)
     {
         return new InlineKeyboardBuilder();
+    }    public static InlineKeyboardBuilder CreateKeyboard(this ICallbackQueryContext context)
+    {
+        return new InlineKeyboardBuilder();
     }
     
     public static PaginationBuilder<T> CreatePagination<T>(this IMessageContext context, IEnumerable<T> items) where T : class

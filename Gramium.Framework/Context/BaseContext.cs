@@ -28,6 +28,7 @@ public abstract class BaseContext(
             message.Chat.Id,
             message.MessageId,
             text,
+            parseMode,
             replyMarkup,
             CancellationToken);
     }

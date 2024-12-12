@@ -25,6 +25,12 @@ public class InlineKeyboardBuilder
         return this;
     }
 
+    public InlineKeyboardBuilder AddButtons(params (string Text, string CallbackData)[] buttons)
+    {
+        var row = buttons.Select(b => new InlineKeyboardButton(b.Text) { CallbackData = b.CallbackData }).ToList();
+        _rows.Add(row);
+        return this;
+    }
     public InlineKeyboardBuilder AddRow()
     {
         if (_currentRow.Count <= 0) return this;

@@ -10,7 +10,13 @@ public interface ITelegramClient
 
     Task DeleteMessageAsync(long chatId, long messageId, CancellationToken ct = default);
 
-    Task<Message> EditMessageTextAsync(long chatId, long messageId, string text, IReplyMarkup? replyMarkup = null, CancellationToken ct = default);
+    Task<Message> EditMessageTextAsync(
+        long chatId,
+        long messageId,
+        string text,
+        ParseMode parseMode = ParseMode.None,
+        IReplyMarkup? replyMarkup = null,
+        CancellationToken ct = default);
 
     Task<Message> SendPhotoAsync(
         long chatId, 
