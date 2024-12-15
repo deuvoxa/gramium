@@ -10,7 +10,7 @@ public class MessageContext(
     ITelegramClient client,
     IServiceProvider services,
     CancellationToken ct = default)
-    : BaseContext(client, services, message: message, ct), IMessageContext
+    : BaseContext(client, services, message, ct), IMessageContext
 {
     public Message Message { get; } = message;
 

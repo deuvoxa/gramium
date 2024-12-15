@@ -8,7 +8,7 @@ public class Account
     public decimal Balance { get; set; }
     public bool IsActive { get; set; }
     public AccountType Type { get; set; }
-    
+
     // Связи с другими сущностями
     public User User { get; set; }
 }

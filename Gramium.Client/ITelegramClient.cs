@@ -19,15 +19,15 @@ public interface ITelegramClient
         CancellationToken ct = default);
 
     Task<Message> SendPhotoAsync(
-        long chatId, 
-        string photo, 
+        long chatId,
+        string photo,
         string? caption = null,
         ParseMode parseMode = ParseMode.None,
         IReplyMarkup? replyMarkup = null,
         CancellationToken ct = default);
 
     Task<Message> SendDocumentAsync(
-        long chatId, 
+        long chatId,
         string document,
         string? caption = null,
         ParseMode parseMode = ParseMode.None,
@@ -35,16 +35,16 @@ public interface ITelegramClient
         CancellationToken ct = default);
 
     Task<Message> SendVideoAsync(
-        long chatId, 
+        long chatId,
         string video,
         string? caption = null,
         ParseMode parseMode = ParseMode.None,
         IReplyMarkup? replyMarkup = null,
         CancellationToken ct = default);
-        
+
     Task<Message> SendMessageAsync(
-        long chatId, 
-        string text, 
+        long chatId,
+        string text,
         ParseMode parseMode = ParseMode.None,
         IReplyMarkup? replyMarkup = null,
         CancellationToken ct = default);

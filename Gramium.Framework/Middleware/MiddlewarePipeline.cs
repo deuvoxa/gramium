@@ -14,7 +14,7 @@ public class MiddlewarePipeline
         var index = 0;
 
         UpdateDelegate next = null!;
-        next = async (ctx) =>
+        next = async ctx =>
         {
             if (index < _middleware.Count)
             {

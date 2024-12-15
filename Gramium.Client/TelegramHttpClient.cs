@@ -34,55 +34,6 @@ public class TelegramHttpClient : ITelegramClient
         _client.BaseAddress = new Uri(options.Value.GetBaseUrl());
         _client.Timeout = options.Value.Timeout;
     }
-    
-    private async Task<TResponse> SendAsync<TResponse>(
-        string method,
-        object? request = null,
-        CancellationToken ct = default)
-    {
-        var methodPath = method.TrimStart('/');
-        
-        using var content = request != null
-            ? new StringContent(
-                JsonSerializer.Serialize(request, _jsonOptions),
-                Encoding.UTF8,
-                "application/json")
-            : null;
-
-        using var response = await _client.PostAsync(
-            methodPath,
-            content ?? new StringContent(string.Empty),
-            ct);
-
-        return await HandleResponseAsync<TResponse>(response, ct);
-    }
-
-    private async Task<TResponse> HandleResponseAsync<TResponse>(
-        HttpResponseMessage response, 
-        CancellationToken ct)
-    {
-        var body = await response.Content.ReadAsStringAsync(ct);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            throw new TelegramApiException(
-                $"Запрос завершился с ошибкой: {response.StatusCode}. Тело ответа: {body}",
-                (int)response.StatusCode);
-        }
-
-        var result = JsonSerializer.Deserialize<TelegramResponse<TResponse>>(
-            body,
-            _jsonOptions);
-
-        if (result?.Ok != true || result.Result == null)
-        {
-            throw new TelegramApiException(
-                $"Ошибка API Telegram: {result?.Description ?? "Неизвестная ошибка"}. Тело ответа: {body}",
-                result?.ErrorCode ?? 0);
-        }
-
-        return result.Result;
-    }
 
     public async Task<Update[]> GetUpdatesAsync(
         int? offset = null,
@@ -98,6 +49,7 @@ public class TelegramHttpClient : ITelegramClient
 
         return await SendAsync<Update[]>("getUpdates", request, ct);
     }
+
     public async Task DeleteMessageAsync(
         long chatId,
         long messageId,
@@ -210,11 +162,59 @@ public class TelegramHttpClient : ITelegramClient
         return await SendAsync<Message>("sendMessage", request, ct);
     }
 
-    private static string GetParseModeString(ParseMode parseMode) => parseMode switch
+    private async Task<TResponse> SendAsync<TResponse>(
+        string method,
+        object? request = null,
+        CancellationToken ct = default)
     {
-        ParseMode.MarkdownV2 => "MarkdownV2",
-        ParseMode.HTML => "HTML",
-        ParseMode.Markdown => "Markdown",
-        _ => string.Empty
-    };
+        var methodPath = method.TrimStart('/');
+
+        using var content = request != null
+            ? new StringContent(
+                JsonSerializer.Serialize(request, _jsonOptions),
+                Encoding.UTF8,
+                "application/json")
+            : null;
+
+        using var response = await _client.PostAsync(
+            methodPath,
+            content ?? new StringContent(string.Empty),
+            ct);
+
+        return await HandleResponseAsync<TResponse>(response, ct);
+    }
+
+    private async Task<TResponse> HandleResponseAsync<TResponse>(
+        HttpResponseMessage response,
+        CancellationToken ct)
+    {
+        var body = await response.Content.ReadAsStringAsync(ct);
+
+        if (!response.IsSuccessStatusCode)
+            throw new TelegramApiException(
+                $"Запрос завершился с ошибкой: {response.StatusCode}. Тело ответа: {body}",
+                (int)response.StatusCode);
+
+        var result = JsonSerializer.Deserialize<TelegramResponse<TResponse>>(
+            body,
+            _jsonOptions);
+
+        if (result?.Ok != true || result.Result == null)
+            throw new TelegramApiException(
+                $"Ошибка API Telegram: {result?.Description ?? "Неизвестная ошибка"}. Тело ответа: {body}",
+                result?.ErrorCode ?? 0);
+
+        return result.Result;
+    }
+
+    private static string GetParseModeString(ParseMode parseMode)
+    {
+        return parseMode switch
+        {
+            ParseMode.MarkdownV2 => "MarkdownV2",
+            ParseMode.HTML => "HTML",
+            ParseMode.Markdown => "Markdown",
+            _ => string.Empty
+        };
+    }
 }

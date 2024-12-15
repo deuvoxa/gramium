@@ -6,6 +6,8 @@ public class TelegramClientOptions
     public string Token { get; set; } = default!;
     public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(30);
 
-    internal string GetBaseUrl() => 
-        $"{BaseUrl.TrimEnd('/')}/bot{Token}/";
+    internal string GetBaseUrl()
+    {
+        return $"{BaseUrl.TrimEnd('/')}/bot{Token}/";
+    }
 }

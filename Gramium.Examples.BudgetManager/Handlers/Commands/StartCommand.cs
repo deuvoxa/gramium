@@ -16,8 +16,8 @@ public class StartCommand : CommandBase
         await GetOrCreateUser(context);
         const string text = "_*Главное меню:*_";
         var keyboard = context.CreateKeyboard()
-            .AddButtons(Buttons.TransactionsMenu, Buttons.AccountsMenu)
-            .AddButtons(Buttons.HomeMenu)
+            .WithButtons(MenuButtons.TransactionsMenu, MenuButtons.AccountsMenu)
+            .WithButtons(MenuButtons.StatisticsMenu)
             .Build();
 
         await context.SendMessageAsync(text, ParseMode.MarkdownV2, keyboard);
@@ -32,7 +32,7 @@ public class StartCommand : CommandBase
         user = new User
         {
             TelegramId = context.Message.From!.Id,
-            FirstName = context.Message.From.FirstName,
+            FirstName = context.Message.From.FirstName
         };
         await userService.AddUserAsync(user);
         return user;

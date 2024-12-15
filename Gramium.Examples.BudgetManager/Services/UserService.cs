@@ -7,7 +7,9 @@ namespace Gramium.Examples.BudgetManager.Services;
 public class UserService(BudgetManagerDbContext context)
 {
     public async Task<User?> GetUserByTelegramIdAsync(long userId)
-    => await context.Users.SingleOrDefaultAsync(u => u.TelegramId == userId);
+    {
+        return await context.Users.SingleOrDefaultAsync(u => u.TelegramId == userId);
+    }
 
     public async Task<User> AddUserAsync(User user)
     {
@@ -15,6 +17,7 @@ public class UserService(BudgetManagerDbContext context)
         await context.SaveChangesAsync();
         return user;
     }
+
     public async Task<User> UpdateUserAsync(User user)
     {
         await context.SaveChangesAsync();

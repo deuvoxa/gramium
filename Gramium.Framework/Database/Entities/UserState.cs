@@ -7,6 +7,6 @@ public class UserState
     public string Key { get; set; } = null!;
     public string Value { get; set; } = null!;
     public DateTime? ExpiresAt { get; set; }
-    
+
     public virtual TelegramUser User { get; set; } = null!;
-} 
+}

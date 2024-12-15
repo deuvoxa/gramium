@@ -9,9 +9,9 @@ public interface IBaseContext
     ITelegramClient Client { get; }
     IServiceProvider Services { get; }
     CancellationToken CancellationToken { get; }
-    
+
     Task<Message> SendMessageAsync(
         string text,
         ParseMode parseMode = ParseMode.None,
         IReplyMarkup? replyMarkup = null);
-} 
+}

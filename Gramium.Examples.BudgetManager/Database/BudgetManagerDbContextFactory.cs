@@ -9,7 +9,7 @@ public class BudgetManagerDbContextFactory : IDesignTimeDbContextFactory<BudgetM
     {
         var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: false)
+            .AddJsonFile("appsettings.json", false)
             .Build();
         var connectionString = configuration.GetConnectionString("DefaultConnection")
                                ?? throw new InvalidOperationException(

@@ -1,6 +1,5 @@
 ﻿using Gramium.Framework.Commands;
 using Gramium.Framework.Commands.Models;
-using Gramium.Framework.Context;
 using Gramium.Framework.Context.Interfaces;
 using Gramium.Framework.Extensions;
 
@@ -14,7 +13,7 @@ public class ModerateCommand : CommandBase
     public override CommandParameter[] Parameters =>
     [
         new("user_id", typeof(long), description: "ID пользователя"),
-        new CommandParameter("reason", typeof(string), description: "Причина", isOptional: true)
+        new("reason", typeof(string), description: "Причина", isOptional: true)
     ];
 
     public override async Task HandleAsync(IMessageContext context, CancellationToken ct = default)

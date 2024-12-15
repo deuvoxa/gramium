@@ -16,12 +16,12 @@ public class DatabaseMigrationService<TContext>(
         try
         {
             logger.LogInformation("Применение миграций для контекста {ContextName}", typeof(TContext).Name);
-            
+
             using var scope = serviceProvider.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<TContext>();
-            
+
             await context.Database.MigrateAsync(cancellationToken);
-            
+
             logger.LogInformation("Миграции успешно применены для контекста {ContextName}", typeof(TContext).Name);
         }
         catch (Exception ex)
@@ -31,5 +31,8 @@ public class DatabaseMigrationService<TContext>(
         }
     }
 
-    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-} 
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+}

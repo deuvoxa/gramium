@@ -7,10 +7,10 @@ public interface IMessageContext : IBaseContext
 {
     Message Message { get; }
     Task DeleteMessageAsync();
-    
+
     Task<Message> EditTextMessageAsync(
         long messageId,
         string text,
         ParseMode parseMode = ParseMode.None,
         IReplyMarkup? replyMarkup = null);
-} 
+}

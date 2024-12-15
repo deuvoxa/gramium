@@ -1,5 +1,4 @@
 ﻿using Gramium.Framework.Commands;
-using Gramium.Framework.Context;
 using Gramium.Framework.Context.Interfaces;
 using Gramium.Framework.Extensions;
 
@@ -9,6 +8,7 @@ public class ProductsCommand : CommandBase
 {
     public override string Command => "/products";
     public override string Description => "Забанить пользователя";
+
     public override async Task HandleAsync(IMessageContext context, CancellationToken ct = default)
     {
         var args = context.Message.Text!.Split(' ').Skip(1).ToArray();
@@ -47,7 +47,7 @@ public class ProductsCommand : CommandBase
             new Product { Name = "Product 10", Price = 20 },
             new Product { Name = "Product 11", Price = 20 },
             new Product { Name = "Product 12", Price = 20 },
-            new Product { Name = "Product 13", Price = 20 },
+            new Product { Name = "Product 13", Price = 20 }
         ];
     }
 }

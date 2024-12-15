@@ -21,12 +21,12 @@ public class ErrorHandlingMiddleware(ITelegramClient client) : IUpdateMiddleware
 
             if (chatId.HasValue)
             {
-                await client.SendMessageAsync(
-                    chatId.Value,
-                    "Произошла ошибка при обработке запроса. Попробуйте позже.",
-                    ct: context.CancellationToken);
+                // await client.SendMessageAsync(
+                //     chatId.Value,
+                //     "Произошла ошибка при обработке запроса. Попробуйте позже.",
+                //     ct: context.CancellationToken);
             }
-            
+
             throw;
         }
     }

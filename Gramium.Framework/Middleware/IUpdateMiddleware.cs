@@ -5,4 +5,4 @@ public interface IUpdateMiddleware
     Task HandleAsync(UpdateContext context, UpdateDelegate next);
 }
 
-public delegate Task UpdateDelegate(UpdateContext context); 
+public delegate Task UpdateDelegate(UpdateContext context);

@@ -16,6 +16,6 @@ public class RegularPayment
     public int PaymentDueDate { get; set; }
     public decimal? Debt { get; set; }
     public string Description { get; set; }
-    
+
     public User User { get; set; }
 }

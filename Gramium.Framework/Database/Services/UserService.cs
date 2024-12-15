@@ -1,6 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using Gramium.Framework.Database.Entities;
 using Gramium.Framework.Database.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace Gramium.Framework.Database.Services;
 
@@ -8,13 +8,16 @@ public class UserService(GramiumDbContext context) : IUserService
 {
     public async Task<TelegramUser?> GetUserAsync(long telegramId)
     {
-        return await context.Users.FirstOrDefaultAsync(u => u.TelegramId == telegramId);
+        return await context.Users
+            .Include(u => u.States)
+            .FirstOrDefaultAsync(u => u.TelegramId == telegramId);
     }
 
-    public async Task<TelegramUser> CreateOrUpdateUserAsync(long telegramId, string firstName, string? username = null, string? languageCode = null)
+    public async Task<TelegramUser> CreateOrUpdateUserAsync(long telegramId, string firstName, string? username = null,
+        string? languageCode = null)
     {
         var user = await GetUserAsync(telegramId);
-        
+
         if (user == null)
         {
             user = new TelegramUser
@@ -57,4 +60,9 @@ public class UserService(GramiumDbContext context) : IUserService
         var userLevel = await GetAccessLevelAsync(telegramId);
         return userLevel >= requiredLevel;
     }
-} 
+
+    public async Task SaveChangesAsync()
+    {
+        await context.SaveChangesAsync();
+    }
+}

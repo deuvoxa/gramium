@@ -12,10 +12,7 @@ public class GramiumDbContext(DbContextOptions<GramiumDbContext> options) : DbCo
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        if (!optionsBuilder.IsConfigured)
-        {
-            optionsBuilder.UseSqlite("Data Source=gramium.db");
-        }
+        if (!optionsBuilder.IsConfigured) optionsBuilder.UseSqlite("Data Source=gramium.db");
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -48,9 +45,6 @@ public class GramiumDbContext(DbContextOptions<GramiumDbContext> options) : DbCo
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
-        modelBuilder.Entity<PayloadEntity>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-        });
+        modelBuilder.Entity<PayloadEntity>(entity => { entity.HasKey(e => e.Id); });
     }
 }

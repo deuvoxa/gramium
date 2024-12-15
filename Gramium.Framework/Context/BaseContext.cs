@@ -1,5 +1,4 @@
 using Gramium.Client;
-using Gramium.Core.Entities.Callbacks;
 using Gramium.Core.Entities.Markup;
 using Gramium.Core.Entities.Messages;
 using Gramium.Framework.Context.Interfaces;
@@ -16,6 +15,15 @@ public abstract class BaseContext(
     public ITelegramClient Client { get; } = client;
     public IServiceProvider Services { get; } = services;
     public CancellationToken CancellationToken { get; } = ct;
+
+    public Task<Message> SendMessageAsync(
+        string text,
+        ParseMode parseMode = ParseMode.None,
+        IReplyMarkup? replyMarkup = null)
+    {
+        return Client.SendMessageAsync(message.Chat.Id, text, parseMode, replyMarkup, CancellationToken);
+    }
+
     public async Task<Message> EditTextMessageAsync(
         string text,
         ParseMode parseMode = ParseMode.None,
@@ -32,12 +40,4 @@ public abstract class BaseContext(
             replyMarkup,
             CancellationToken);
     }
-    
-    public Task<Message> SendMessageAsync(
-        string text,
-        ParseMode parseMode = ParseMode.None,
-        IReplyMarkup? replyMarkup = null)
-    {
-        return Client.SendMessageAsync(message.Chat.Id, text, parseMode, replyMarkup, CancellationToken);
-    }
-} 
+}

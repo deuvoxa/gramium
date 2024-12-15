@@ -4,14 +4,11 @@ namespace Gramium.Core.Entities.Markup;
 
 public class InlineKeyboardButton(string text)
 {
-    [JsonPropertyName("text")]
-    public string Text { get; set; } = text;
+    [JsonPropertyName("text")] public string Text { get; set; } = text;
 
-    [JsonPropertyName("callback_data")]
-    public string? CallbackData { get; set; }
+    [JsonPropertyName("callback_data")] public string? CallbackData { get; set; }
 
-    [JsonPropertyName("url")]
-    public string? Url { get; set; }
+    [JsonPropertyName("url")] public string? Url { get; set; }
 
     public static InlineKeyboardButton WithCallbackData(string text, string callbackData)
     {

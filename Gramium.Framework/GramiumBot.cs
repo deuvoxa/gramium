@@ -11,13 +11,13 @@ namespace Gramium.Framework;
 public class GramiumBot : IGramiumBot
 {
     private readonly ITelegramClient _client;
-    private readonly IServiceProvider _serviceProvider;
-    private readonly MiddlewarePipeline _pipeline;
     private readonly ILogger<GramiumBot> _logger;
-    private long? _offset;
-    private volatile bool _isRunning;
-    private readonly SemaphoreSlim _semaphore = new(1, 1);
+    private readonly MiddlewarePipeline _pipeline;
     private readonly IServiceScopeFactory _scopeFactory;
+    private readonly SemaphoreSlim _semaphore = new(1, 1);
+    private readonly IServiceProvider _serviceProvider;
+    private volatile bool _isRunning;
+    private long? _offset;
 
     public GramiumBot(
         ITelegramClient client,
@@ -45,7 +45,7 @@ public class GramiumBot : IGramiumBot
 
         if (!await _semaphore.WaitAsync(0, ct))
         {
-            _logger.LogWarning("Бот уже запущен"); 
+            _logger.LogWarning("Бот уже запущен");
             return;
         }
 
@@ -55,19 +55,17 @@ public class GramiumBot : IGramiumBot
             _logger.LogInformation("Бот запущен");
 
             while (_isRunning && !ct.IsCancellationRequested)
-            {
                 try
                 {
                     using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
                     timeoutCts.CancelAfter(TimeSpan.FromSeconds(30));
 
                     var updates = await _client.GetUpdatesAsync(
-                        offset: (int?)_offset,
-                        limit: 100,
-                        ct: timeoutCts.Token);
+                        (int?)_offset,
+                        100,
+                        timeoutCts.Token);
 
                     foreach (var update in updates)
-                    {
                         try
                         {
                             var context = new UpdateContext(update, _serviceProvider, ct);
@@ -78,7 +76,6 @@ public class GramiumBot : IGramiumBot
                         {
                             _logger.LogError(ex, "Ошибка при обработке обновления {UpdateId}", update.UpdateId);
                         }
-                    }
                 }
                 catch (OperationCanceledException) when (ct.IsCancellationRequested)
                 {
@@ -89,7 +86,6 @@ public class GramiumBot : IGramiumBot
                     _logger.LogError(ex, "Ошибка при получении обновлений");
                     await Task.Delay(TimeSpan.FromSeconds(5), ct);
                 }
-            }
         }
         finally
         {

@@ -7,24 +7,24 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Gramium.Client\Gramium.Client.csproj" />
-      <ProjectReference Include="..\Gramium.Core\Gramium.Core.csproj" />
+        <ProjectReference Include="..\Gramium.Client\Gramium.Client.csproj"/>
+        <ProjectReference Include="..\Gramium.Core\Gramium.Core.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.11" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11" />
-      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.11"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11"/>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="Microsoft.Extensions.Hosting.Abstractions">
-        <HintPath>C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.11\Microsoft.Extensions.Hosting.Abstractions.dll</HintPath>
-      </Reference>
+        <Reference Include="Microsoft.Extensions.Hosting.Abstractions">
+            <HintPath>C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.11\Microsoft.Extensions.Hosting.Abstractions.dll</HintPath>
+        </Reference>
     </ItemGroup>
 
 </Project>

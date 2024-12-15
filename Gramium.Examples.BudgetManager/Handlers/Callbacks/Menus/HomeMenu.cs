@@ -7,12 +7,14 @@ namespace Gramium.Examples.BudgetManager.Handlers.Callbacks.Menus;
 
 public class HomeMenu : CallbackQueryBase
 {
-    public override string CallbackData => "menu-home";
+    public override string CallbackData => MenuButtons.HomeMenu.Item2;
+
     public override async Task HandleAsync(ICallbackQueryContext context, CancellationToken ct = default)
     {
         const string text = "_*Главное меню:*_";
         var keyboard = context.CreateKeyboard()
-            .AddButtons(Buttons.TransactionsMenu, Buttons.AccountsMenu)
+            .WithButtons(MenuButtons.TransactionsMenu, MenuButtons.AccountsMenu)
+            .WithButtons(MenuButtons.StatisticsMenu)
             .Build();
 
         await context.EditTextMessageAsync(text, ParseMode.MarkdownV2, keyboard);

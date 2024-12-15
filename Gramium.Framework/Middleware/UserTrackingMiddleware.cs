@@ -9,19 +9,17 @@ public class UserTrackingMiddleware(IServiceScopeFactory scopeFactory) : IUpdate
     {
         using var scope = scopeFactory.CreateScope();
         var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
-        
+
         var user = context.Update.Message?.From ?? context.Update.CallbackQuery?.From;
-        
+
         if (user != null)
-        {
             await userService.CreateOrUpdateUserAsync(
                 user.Id,
                 user.FirstName,
                 user.Username,
                 user.LanguageCode
             );
-        }
 
         await next(context);
     }
-} 
+}

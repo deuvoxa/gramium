@@ -6,7 +6,7 @@ public class GramiumException : Exception
     {
     }
 
-    public GramiumException(string message, Exception innerException) 
+    public GramiumException(string message, Exception innerException)
         : base(message, innerException)
     {
     }

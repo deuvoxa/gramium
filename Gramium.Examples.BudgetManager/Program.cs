@@ -19,7 +19,8 @@ services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 
 services.AddGramium(configuration["Telegram:Token"]!)
-    .AddDatabase<BudgetManagerDbContext>(configuration.GetConnectionString("DefaultConnection")!, DatabaseProvider.Postgresql);
+    .AddDatabase<BudgetManagerDbContext>(configuration.GetConnectionString("DefaultConnection")!,
+        DatabaseProvider.Postgresql);
 services.AddScoped<UserService>();
 
 var app = builder.Build();

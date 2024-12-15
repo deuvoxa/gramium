@@ -1,5 +1,4 @@
 ﻿using Gramium.Framework.Callbacks;
-using Gramium.Framework.Context;
 using Gramium.Framework.Context.Interfaces;
 
 namespace Gramium.Examples.Basic.Handlers;

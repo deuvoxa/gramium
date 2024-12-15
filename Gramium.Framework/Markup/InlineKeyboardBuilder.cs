@@ -7,31 +7,32 @@ public class InlineKeyboardBuilder
     private readonly List<List<InlineKeyboardButton>> _rows = [];
     private List<InlineKeyboardButton> _currentRow = [];
 
-    public InlineKeyboardBuilder AddButton(string text, string callbackData)
+    public InlineKeyboardBuilder WithButton((string text, string callbackData) button)
     {
-        _currentRow.Add(new InlineKeyboardButton(text) { CallbackData = callbackData });
+        _currentRow.Add(new InlineKeyboardButton(button.text) { CallbackData = button.callbackData });
         return this;
     }
 
-    public InlineKeyboardBuilder AddButtonRow(string text, string callbackData)
+    public InlineKeyboardBuilder WithButtonRow(string text, string callbackData)
     {
         if (_currentRow.Count > 0)
         {
             _rows.Add(_currentRow);
             _currentRow = [];
         }
-        
+
         _rows.Add([new InlineKeyboardButton(text) { CallbackData = callbackData }]);
         return this;
     }
 
-    public InlineKeyboardBuilder AddButtons(params (string Text, string CallbackData)[] buttons)
+    public InlineKeyboardBuilder WithButtons(params (string Text, string CallbackData)[] buttons)
     {
         var row = buttons.Select(b => new InlineKeyboardButton(b.Text) { CallbackData = b.CallbackData }).ToList();
         _rows.Add(row);
         return this;
     }
-    public InlineKeyboardBuilder AddRow()
+
+    public InlineKeyboardBuilder WithRow()
     {
         if (_currentRow.Count <= 0) return this;
         _rows.Add(_currentRow);
@@ -41,11 +42,8 @@ public class InlineKeyboardBuilder
 
     public InlineKeyboardMarkup Build()
     {
-        if (_currentRow.Count > 0)
-        {
-            _rows.Add(_currentRow);
-        }
-        
+        if (_currentRow.Count > 0) _rows.Add(_currentRow);
+
         return new InlineKeyboardMarkup(_rows.Select(row => row.ToArray()).ToArray());
     }
 }

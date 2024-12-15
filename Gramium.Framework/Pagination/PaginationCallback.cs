@@ -1,12 +1,11 @@
 ﻿using Gramium.Framework.Callbacks;
-using Gramium.Framework.Context;
 using Gramium.Framework.Context.Interfaces;
 using Gramium.Framework.Database.Services;
 using Gramium.Framework.Markup;
 
 namespace Gramium.Framework.Pagination;
 
-public class PaginationCallback(IPayloadService payloadService) 
+public class PaginationCallback(IPayloadService payloadService)
     : PayloadCallbackBase<PaginationPayload>
 {
     public override string CallbackData => "pagination";
@@ -38,18 +37,18 @@ public class PaginationCallback(IPayloadService payloadService)
         }.Where(x => !string.IsNullOrEmpty(x)));
 
         var keyboard = new InlineKeyboardBuilder();
-        
+
         if (newPage > 1)
-        {
-            keyboard.AddButton(payload.PreviousButtonText, 
-                await payloadService.SavePayloadAsync(GetType().FullName!, payload with { Page = newPage, Direction = "previous" }));
-        }
-        
+            keyboard.WithButton((payload.PreviousButtonText,
+                await payloadService.SavePayloadAsync(GetType().FullName!,
+                    payload with { Page = newPage, Direction = "previous" })));
+
         if (newPage < payload.TotalPages)
-        {
-            keyboard.AddButton(payload.NextButtonText, 
-                await payloadService.SavePayloadAsync(GetType().FullName!, payload with { Page = newPage, Direction = "next" }));
-        }
+            keyboard.WithButton((payload.NextButtonText,
+                await payloadService.SavePayloadAsync(GetType().FullName!,
+                    payload with { Page = newPage, Direction = "next" })));
+
+        foreach (var button in payload.AdditionalButtons) keyboard.WithButton(button);
 
         await context.EditTextMessageAsync(messageText, replyMarkup: keyboard.Build());
     }

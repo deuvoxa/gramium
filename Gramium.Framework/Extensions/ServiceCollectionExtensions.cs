@@ -1,15 +1,15 @@
 using System.Reflection;
 using Gramium.Client;
 using Gramium.Framework.Callbacks.Interfaces;
-using Gramium.Framework.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
-using Gramium.Framework.Middleware;
-using ICommandHandler = Gramium.Framework.Commands.Interfaces.ICommandHandler;
 using Gramium.Framework.Database;
 using Gramium.Framework.Database.Enums;
 using Gramium.Framework.Database.Services;
+using Gramium.Framework.Interfaces;
+using Gramium.Framework.Middleware;
 using Gramium.Framework.Pagination;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using ICommandHandler = Gramium.Framework.Commands.Interfaces.ICommandHandler;
 
 namespace Gramium.Framework.Extensions;
 
@@ -61,9 +61,9 @@ public static class ServiceCollectionExtensions
 
         var callbackHandlers = callingAssembly.GetTypes()
             .Where(t => !t.IsAbstract && typeof(ICallbackQueryHandler).IsAssignableFrom(t));
-        
+
         services.AddScoped<PaginationCallback>();
-        services.AddScoped<ICallbackQueryHandler>(sp => 
+        services.AddScoped<ICallbackQueryHandler>(sp =>
             sp.GetRequiredService<PaginationCallback>());
 
         foreach (var handler in callbackHandlers)
@@ -78,6 +78,14 @@ public static class ServiceCollectionExtensions
             });
         }
 
+        var dialogTypes = callingAssembly.GetTypes()
+            .Where(t => !t.IsAbstract && t.Name.EndsWith("Dialog"));
+
+        foreach (var dialogType in dialogTypes)
+        {
+            services.AddScoped(dialogType);
+        }
+
         return services;
     }
 
@@ -87,13 +95,10 @@ public static class ServiceCollectionExtensions
         DatabaseProvider provider,
         bool autoApplyMigrations = true) where TContext : DbContext
     {
-        services.AddScoped<TContext>(sp => 
+        services.AddScoped<TContext>(sp =>
             (TContext)Activator.CreateInstance(typeof(TContext), connectionString, provider)!);
 
-        if (autoApplyMigrations)
-        {
-            services.AddHostedService<DatabaseMigrationService<TContext>>();
-        }
+        if (autoApplyMigrations) services.AddHostedService<DatabaseMigrationService<TContext>>();
 
         return services;
     }

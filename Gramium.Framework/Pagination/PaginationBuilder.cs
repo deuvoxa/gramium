@@ -1,17 +1,17 @@
-﻿using Gramium.Framework.Context;
+﻿using Gramium.Core.Entities.Messages;
 using Gramium.Framework.Context.Interfaces;
 using Gramium.Framework.Extensions;
 using Gramium.Framework.Markup;
 
 namespace Gramium.Framework.Pagination;
 
-public class PaginationBuilder<T>(IMessageContext context, IEnumerable<T> items)
+public class PaginationBuilder<T>(IBaseContext context, IEnumerable<T> items)
     where T : class
 {
-    private int _itemsPerPage = 10;
+    private string? _footer;
     private Func<T, string?> _formatItem = item => item.ToString();
     private string? _header;
-    private string? _footer;
+    private int _itemsPerPage = 10;
     private string _nextButtonText = "Next";
     private string _previousButtonText = "Previous";
 
@@ -46,23 +46,38 @@ public class PaginationBuilder<T>(IMessageContext context, IEnumerable<T> items)
         return this;
     }
 
-    public async Task SendAsync()
+    public async Task SendAsync(ParseMode parseMode = ParseMode.None,
+        params (string Text, string CallbackData)[] additionalButtons)
     {
         var itemsList = items.ToList();
         var totalItems = itemsList.Count;
         var totalPages = (int)Math.Ceiling(totalItems / (double)_itemsPerPage);
         const int currentPage = 1;
 
-        await SendPageAsync(currentPage, totalPages);
+        await SendPageAsync(currentPage, totalPages, parseMode, additionalButtons);
     }
 
-    private async Task SendPageAsync(int page, int totalPages)
+    public async Task EditAsync(ParseMode parseMode = ParseMode.None,
+        params (string Text, string CallbackData)[] additionalButtons)
+    {
+        var itemsList = items.ToList();
+        var totalItems = itemsList.Count;
+        var totalPages = (int)Math.Ceiling(totalItems / (double)_itemsPerPage);
+        const int currentPage = 1;
+
+        await EditPageAsync(currentPage, totalPages, parseMode, additionalButtons);
+    }
+
+    private async Task SendPageAsync(int page, int totalPages, ParseMode parseMode,
+        params (string Text, string CallbackData)[] additionalButtons)
     {
         var keyboard = new InlineKeyboardBuilder();
 
         if (page > 1) keyboard.WithPayloadButton(context, _previousButtonText, CreatePayload("previous"));
 
         if (page < totalPages) keyboard.WithPayloadButton(context, _nextButtonText, CreatePayload("next"));
+
+        foreach (var button in additionalButtons) keyboard.WithButton(button);
 
         var start = (page - 1) * _itemsPerPage;
         var pagedItems = items.Skip(start).Take(_itemsPerPage);
@@ -75,11 +90,12 @@ public class PaginationBuilder<T>(IMessageContext context, IEnumerable<T> items)
             _footer != null ? string.Format(_footer, page, totalPages) : null
         }.Where(x => !string.IsNullOrEmpty(x)));
 
-        await context.SendMessageAsync(messageText, replyMarkup: keyboard.Build());
+        await context.SendMessageAsync(messageText, parseMode, keyboard.Build());
         return;
-        
+
         PaginationPayload CreatePayload(string direction)
-            => new()
+        {
+            return new PaginationPayload
             {
                 Page = page,
                 TotalPages = totalPages,
@@ -89,26 +105,54 @@ public class PaginationBuilder<T>(IMessageContext context, IEnumerable<T> items)
                 Header = _header,
                 Footer = _footer,
                 NextButtonText = _nextButtonText,
+                AdditionalButtons = additionalButtons.ToList(),
                 PreviousButtonText = _previousButtonText
             };
+        }
     }
-}
 
-public class ItemWrapper(object original, string formatted)
-{
-    public object Original { get; } = original;
-    public string Formatted { get; } = formatted;
-}
+    private async Task EditPageAsync(int page, int totalPages, ParseMode parseMode,
+        params (string Text, string CallbackData)[] additionalButtons)
+    {
+        var keyboard = new InlineKeyboardBuilder();
 
-public record PaginationPayload
-{
-    public required int Page { get; init; }
-    public required int TotalPages { get; init; }
-    public required int ItemsPerPage { get; init; }
-    public required IReadOnlyList<ItemWrapper> Items { get; init; }
-    public required string? Header { get; init; }
-    public required string? Footer { get; init; }
-    public required string PreviousButtonText { get; init; }
-    public required string NextButtonText { get; init; }
-    public string Direction { get; init; } = "";
+        if (page > 1) keyboard.WithPayloadButton(context, _previousButtonText, CreatePayload("previous"));
+
+        if (page < totalPages) keyboard.WithPayloadButton(context, _nextButtonText, CreatePayload("next"));
+
+        foreach (var button in additionalButtons) keyboard.WithButton(button);
+
+        var start = (page - 1) * _itemsPerPage;
+        var pagedItems = items.Skip(start).Take(_itemsPerPage);
+        var formattedItems = string.Join("\n", pagedItems.Select(_formatItem));
+
+        var messageText = string.Join("\n", new[]
+        {
+            _header,
+            formattedItems,
+            _footer != null ? string.Format(_footer, page, totalPages) : null
+        }.Where(x => !string.IsNullOrEmpty(x)));
+
+        // TODO: возможна ошибка если context is IMessageContext
+        if (context is ICallbackQueryContext callbackContext)
+            await callbackContext.EditTextMessageAsync(messageText, parseMode, keyboard.Build());
+        return;
+
+        PaginationPayload CreatePayload(string direction)
+        {
+            return new PaginationPayload
+            {
+                Page = page,
+                TotalPages = totalPages,
+                ItemsPerPage = _itemsPerPage,
+                Items = items.Select(x => new ItemWrapper(x, _formatItem(x)!)).ToList(),
+                Direction = direction,
+                Header = _header,
+                Footer = _footer,
+                NextButtonText = _nextButtonText,
+                AdditionalButtons = additionalButtons.ToList(),
+                PreviousButtonText = _previousButtonText
+            };
+        }
+    }
 }
