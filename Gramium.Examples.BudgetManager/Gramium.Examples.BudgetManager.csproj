@@ -16,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Examples\Gramium.Examples.Basic\Gramium.Examples.Basic.csproj" />
         <ProjectReference Include="..\Gramium.Framework\Gramium.Framework.csproj"/>
     </ItemGroup>
 

@@ -7,6 +7,7 @@ using Gramium.Framework.Database.Services;
 using Gramium.Framework.Interfaces;
 using Gramium.Framework.Middleware;
 using Gramium.Framework.Pagination;
+using Gramium.Framework.States;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ICommandHandler = Gramium.Framework.Commands.Interfaces.ICommandHandler;
@@ -36,12 +37,14 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IPayloadService, PayloadService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IUserStateService, UserStateService>();
 
         var callingAssembly = Assembly.GetCallingAssembly();
 
         services.AddSingleton<IUpdateMiddleware, LoggingMiddleware>();
         services.AddSingleton<IUpdateMiddleware, ErrorHandlingMiddleware>();
         services.AddSingleton<IUpdateMiddleware, UserTrackingMiddleware>();
+        services.AddSingleton<IUpdateMiddleware, StateHandlingMiddleware>();
         services.AddSingleton<IUpdateMiddleware, CallbackQueryHandlingMiddleware>();
         services.AddSingleton<IUpdateMiddleware, CommandHandlingMiddleware>();
 
@@ -77,15 +80,22 @@ public static class ServiceCollectionExtensions
                            $"Не удалось создать обработчик callback-запросов типа {handler.Name}");
             });
         }
+        
+        var stateHandlers = callingAssembly.GetTypes()
+            .Where(t => !t.IsAbstract && typeof(IStateHandler).IsAssignableFrom(t));
 
-        var dialogTypes = callingAssembly.GetTypes()
-            .Where(t => !t.IsAbstract && t.Name.EndsWith("Dialog"));
-
-        foreach (var dialogType in dialogTypes)
+        foreach (var handler in stateHandlers)
         {
-            services.AddScoped(dialogType);
+            services.AddScoped(handler);
+            services.AddScoped<IStateHandler>(sp =>
+            {
+                var service = sp.GetRequiredService(handler);
+                return service as IStateHandler ??
+                       throw new InvalidOperationException(
+                           $"Не удалось создать обработчик состояний типа {handler.Name}");
+            });
         }
-
+        
         return services;
     }
 
