@@ -39,6 +39,20 @@ public class InlineKeyboardBuilder
         _currentRow = [];
         return this;
     }
+    
+    public InlineKeyboardBuilder WithButtonGrid(IEnumerable<(string text, string callbackData)> buttons, int buttonsPerRow = 3)
+    {
+        var buttonList = buttons
+            .Select(b => new InlineKeyboardButton(b.text) { CallbackData = b.callbackData })
+            .ToList();
+
+        for (int i = 0; i < buttonList.Count; i += buttonsPerRow)
+        {
+            _rows.Add(buttonList.Skip(i).Take(buttonsPerRow).ToList());
+        }
+
+        return this;
+    }
 
     public InlineKeyboardMarkup Build()
     {

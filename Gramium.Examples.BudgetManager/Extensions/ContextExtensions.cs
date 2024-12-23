@@ -6,7 +6,7 @@ namespace Gramium.Examples.BudgetManager.Extensions;
 
 public static class ContextExtensions
 {
-    public static async Task<User> GetUser(this IBaseContext context)
+    public static async Task<User> GetUserAsync(this IBaseContext context)
     {
         var userService = context.Services.GetRequiredService<UserService>();
         return context switch

@@ -101,5 +101,4 @@ public class RegistrationState
     public string Step { get; set; } = null!;
     public string? Name { get; set; }
     public int? Age { get; set; }
-    public string? Test { get; set; }
 }

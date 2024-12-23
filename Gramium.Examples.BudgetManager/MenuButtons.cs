@@ -13,6 +13,7 @@ public static class TransactionButtons
     public static (string, string) Add => ("Добавить транзакцию", "transactions-add");
     public static (string, string) Remove => ("Удалить транзакцию", "transactions-remove");
     public static (string, string) Transfer => ("Перевод между счетами", "transactions-transfer");
+    public static string SelectCategory => "transactions-selectCategory-";
 }
 
 public static class AccountButtons
