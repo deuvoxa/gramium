@@ -14,6 +14,10 @@ public class MessageContext(
 {
     public Message Message { get; } = message;
 
+    public async Task DeleteMessageAsync(long messageId)
+        => await Client.DeleteMessageAsync(Message.Chat.Id, messageId, CancellationToken);
+
+
     public async Task<Message> EditTextMessageAsync(long messageId, string text, ParseMode parseMode = ParseMode.None,
         IReplyMarkup? replyMarkup = null)
     {
@@ -27,10 +31,5 @@ public class MessageContext(
             parseMode,
             replyMarkup,
             CancellationToken);
-    }
-
-    public Task DeleteMessageAsync()
-    {
-        return Client.DeleteMessageAsync(Message.Chat.Id, Message.MessageId, CancellationToken);
     }
 }

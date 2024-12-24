@@ -38,6 +38,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPayloadService, PayloadService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IUserStateService, UserStateService>();
+        services.AddScoped<IUserMetadataService, UserMetadataService>();
 
         var callingAssembly = Assembly.GetCallingAssembly();
 

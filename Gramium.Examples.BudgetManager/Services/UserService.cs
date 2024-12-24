@@ -8,7 +8,11 @@ public class UserService(BudgetManagerDbContext context)
 {
     public async Task<User?> GetUserByTelegramIdAsync(long userId)
     {
-        return await context.Users.SingleOrDefaultAsync(u => u.TelegramId == userId);
+        return await context.Users
+            .Include(u => u.Accounts)
+            .Include(u => u.Transactions)
+            .Include(u => u.RegularPayments)
+            .SingleOrDefaultAsync(u => u.TelegramId == userId);
     }
 
     public async Task<User> AddUserAsync(User user)

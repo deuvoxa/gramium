@@ -1,4 +1,5 @@
 using Gramium.Framework.Context.Interfaces;
+using Gramium.Framework.Database.Enums;
 using Gramium.Framework.Database.Services;
 using Gramium.Framework.Markup;
 using Gramium.Framework.Pagination;
@@ -18,6 +19,46 @@ public static class ContextExtensions
         where T : class
     {
         return new PaginationBuilder<T>(context, items);
+    }
+    
+    public static async Task<bool> HasAccessLevelAsync(this IBaseContext context, AccessLevel requiredLevel)
+    {
+        var userService = context.Services.GetRequiredService<IUserService>();
+        var from = context is IMessageContext messageContext 
+            ? messageContext.Message.From! 
+            : ((ICallbackQueryContext)context).CallbackQuery.From;
+            
+        return await userService.HasAccessLevelAsync(from.Id, requiredLevel);
+    }
+    
+    public static async Task<string?> GetMetadataAsync(this IBaseContext context, string key)
+    {
+        var metadataService = context.Services.GetRequiredService<IUserMetadataService>();
+        var from = context is IMessageContext messageContext 
+            ? messageContext.Message.From! 
+            : ((ICallbackQueryContext)context).CallbackQuery.From;
+            
+        return await metadataService.GetMetadataValueAsync(from.Id, key);
+    }
+
+    public static async Task SetMetadataAsync(this IBaseContext context, string key, string value)
+    {
+        var metadataService = context.Services.GetRequiredService<IUserMetadataService>();
+        var from = context is IMessageContext messageContext 
+            ? messageContext.Message.From! 
+            : ((ICallbackQueryContext)context).CallbackQuery.From;
+            
+        await metadataService.SetMetadataAsync(from.Id, key, value);
+    }
+
+    public static async Task RemoveMetadataAsync(this IBaseContext context, string key)
+    {
+        var metadataService = context.Services.GetRequiredService<IUserMetadataService>();
+        var from = context is IMessageContext messageContext 
+            ? messageContext.Message.From!
+            : ((ICallbackQueryContext)context).CallbackQuery.From;
+            
+        await metadataService.RemoveMetadataAsync(from.Id, key);
     }
 
     public static async Task SetStateAsync<TState, THandler>(

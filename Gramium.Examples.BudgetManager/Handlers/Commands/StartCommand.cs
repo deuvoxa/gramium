@@ -20,7 +20,8 @@ public class StartCommand : CommandBase
             .WithButtons(MenuButtons.StatisticsMenu)
             .Build();
 
-        await context.SendMessageAsync(text, ParseMode.MarkdownV2, keyboard);
+        var message = await context.SendMessageAsync(text, ParseMode.MarkdownV2, keyboard);
+        await context.SetMetadataAsync("MainMessageId", message.MessageId.ToString());
     }
 
     private static async Task<User> GetOrCreateUser(IMessageContext context)

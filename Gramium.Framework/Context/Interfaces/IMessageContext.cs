@@ -6,7 +6,7 @@ namespace Gramium.Framework.Context.Interfaces;
 public interface IMessageContext : IBaseContext
 {
     Message Message { get; }
-    Task DeleteMessageAsync();
+    Task DeleteMessageAsync(long messageId);
 
     Task<Message> EditTextMessageAsync(
         long messageId,
