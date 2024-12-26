@@ -47,16 +47,24 @@ public class AddTransactionStateHandler : BaseStateHandler<TransactionState>
 
     public override async Task<bool> HandleMessageAsync(IMessageContext context, TransactionState state)
     {
+        if (context.Message.Text == "/start")
+        {
+            await context.RemoveStateAsync<AddTransactionStateHandler>(context.Message.From!.Id);
+            return false;
+        }
         switch (state.Step)
         {
             case "amount":
             {
-                if (context.Message.Text == "/start") return false;
                 var mainMessageId = await context.GetMetadataAsync("MainMessageId");
                 // todo: протестить
                 if (mainMessageId is null)
                 {
                     await new StartCommand().HandleAsync(context);
+                    
+                    // todo: получать все сообщения и делать основным первое сообщение от бота
+                    // await context.SetMetadataAsync("MainMessageId", context.Message.MessageId.ToString());
+                    
                     mainMessageId = await context.GetMetadataAsync("MainMessageId");
                 }
 
@@ -100,17 +108,19 @@ public class AddTransactionStateHandler : BaseStateHandler<TransactionState>
 
     public override async Task<bool> HandleCallbackQueryAsync(ICallbackQueryContext context, TransactionState state)
     {
-        if (context.CallbackQuery.Data == MenuButtons.TransactionsMenu.Item2) return false;
+        if (context.CallbackQuery.Data == MenuButtons.TransactionsMenu.Item2)
+        {
+            await context.RemoveStateAsync<AddTransactionStateHandler>(context.CallbackQuery.From.Id);
+            return false;
+        }
         switch (state.Step)
         {
             case "account":
             {
-                // var user = await context.GetUserAsync();
-                // var account = user.Accounts.Single(a => a.Id.ToString() == context.CallbackQuery.Data);
-
                 state.Step = "category";
                 state.AccountId = context.CallbackQuery.Data;
 
+                // todo: добавлять все стартовые категории изначально при регистрации, чтобы дать возможность удаления базовых категорий
                 List<(string, string)> categories =
                 [
                     ("Продукты", $"{TransactionButtons.SelectCategory}Еда"),
@@ -126,7 +136,6 @@ public class AddTransactionStateHandler : BaseStateHandler<TransactionState>
 
                 var keyboard = context.CreateKeyboard()
                     .WithButtonGrid(categories)
-                    .WithButtons(MenuButtons.TransactionsMenu)
                     .Build();
 
                 await context.EditTextMessageAsync("Выберите категорию транзакции:", ParseMode.MarkdownV2, keyboard);

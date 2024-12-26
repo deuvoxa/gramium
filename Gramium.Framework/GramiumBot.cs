@@ -83,8 +83,11 @@ public class GramiumBot : IGramiumBot
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Ошибка при получении обновлений");
-                    await Task.Delay(TimeSpan.FromSeconds(5), ct);
+                    if (ex.Message is not "The operation was canceled.")
+                    {
+                        _logger.LogError(ex, "Ошибка при получении обновлений");
+                        await Task.Delay(TimeSpan.FromSeconds(5), ct);
+                    }
                 }
         }
         finally

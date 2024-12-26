@@ -18,4 +18,9 @@ public static class ContextExtensions
             _ => default!
         };
     }
+    public static async Task UpdateUserAsync(this IBaseContext context, User user)
+    {
+        var userService = context.Services.GetRequiredService<UserService>();
+        await userService.UpdateUserAsync(user);
+    }
 }
